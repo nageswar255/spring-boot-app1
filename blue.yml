@@ -1,0 +1,121 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-green
+  labels:
+    app: app
+spec:
+  replicas:
+  selector:
+    matchLabels:
+      app: app
+      version: v2.0.0
+  template:
+    metadata:
+      labels:
+        app: app
+        version: v2.0.0
+    spec:
+      containers:
+      - name: app
+        image: green:v1
+        ports:
+        - containerPort: 8081
+        env:
+        - name: VERSION
+          value: v2.0.0
+        # livenessProbe:
+        #   httpGet:
+        #     path: /
+        #     port: 8081
+        #   initialDelaySeconds: 15
+        #   periodSeconds: 5
+        # readinessProbe:
+        #   httpGet:
+        #     path: /
+        #     port: 8081
+        #   periodSeconds: 5
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-blue
+  labels:
+    app: app
+spec:
+  replicas:
+  selector:
+    matchLabels:
+      app: app
+      version: v1.0.0
+  template:
+    metadata:
+      labels:
+        app: app
+        version: v1.0.0
+    spec:
+      containers:
+      - name: app
+        image: blue:v1
+        ports:
+        - containerPort: 8081
+        env:
+        - name: VERSION
+          value: v1.0.0  
+# ---  
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: app-bluegreen
+#   labels:
+#     app: app
+# spec:
+#   replicas:
+#   selector:
+#     matchLabels:
+#       app: app
+#       version: v3.0.0
+#   template:
+#     metadata:
+#       labels:
+#         app: app
+#         version: v3.0.0
+#     spec:
+#       containers:
+#       - name: app
+#         image: bluegreen:v1
+#         ports:
+#         - containerPort: 8081
+#         env:
+#         - name: VERSION
+#           value: v3.0.0 
+
+---
+ 
+apiVersion: v1
+kind: Service
+metadata:
+  name: app
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 8081
+
+  # Note here that we match both the app and the version
+  selector:
+    app: app
+    version: v1.0.0
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: app-green
+# spec:
+#   type: LoadBalancer
+#   ports:
+#   - port: 8081
+
+#   # Note here that we match both the app and the version
+#   selector:
+#     app: app
+#     version: v2.0.0  
